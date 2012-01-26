@@ -2,7 +2,7 @@
 
 using namespace std;
 
-int chain( int n ) {
+int chain( long long int n ) {
     int count = 1;
     while ( n > 1 ) {
         if ( n % 2 == 0 ) {
@@ -16,7 +16,7 @@ int chain( int n ) {
     return count;
 }
 
-int max, i, n, temp;
+long long int max, i, n, temp;
 
 int main() {
     for ( i = 2; i < 1000000; ++i ) {
@@ -26,6 +26,6 @@ int main() {
             n = i;
         }
     }
-    printf( "%i\n", n );
+    printf( "%lli\n", n );
     return 0;
 }
