@@ -1,18 +1,22 @@
 #include <cstdio>
+#include <stack>
 
 using namespace std;
 
 const int N = 80;
 const bool debug = false;
+const int UP = 0;
+const int RIGHT = 1;
+const int DOWN = 2;
 
-int min( int a, int b ) {
+long long int min( long long int a, long long int b ) {
     if ( a < b ) {
         return a;
     }
     return b;
 }
 
-void W( unsigned long long int w[ N ][ N ], unsigned long long int matrix[ N ][ N ], int i, int j ) {
+void W( long long int w[ N ][ N ], long long int matrix[ N ][ N ], int i, int j ) {
     int k, l = 0, minPath = 0, sum;
     while ( l < N ) {
         sum = w[ l ][ j - 1 ];
@@ -32,14 +36,16 @@ void W( unsigned long long int w[ N ][ N ], unsigned long long int matrix[ N ][ 
     w[ i ][ j ] = minPath + matrix[ i ][ j ];
 }
 
-int i, j;
-unsigned long long matrix[ N ][ N ], w[ N ][ N ], solution;
+int i, j, x, y;
+long long minim;
+long long matrix[ N ][ N ], w[ N ][ N ], solution;
 FILE *in = fopen( "problem82.in", "r" ), *out = fopen( "problem82.out", "w" );
+stack< int > p;
 
 int main() {
     for ( i = 0; i < N; ++i ) {
         for ( j = 0; j < N; ++j ) {
-            fscanf( in, "%i,", &matrix[ i ][ j ] );
+            fscanf( in, "%lli,", &matrix[ i ][ j ] );
             if ( j == 0 ) {
                 w[ i ][ j ] = matrix[ i ][ j ];
             }
@@ -54,7 +60,7 @@ int main() {
     if ( debug ) {
         for ( i = 0; i < N; ++i ) {
             for ( j = 0; j < N; ++j ) {
-                printf( "%i ", w[ i ][ j ] );
+                printf( "%lli ", w[ i ][ j ] );
             }
             printf( "\n" );
         }
@@ -64,7 +70,61 @@ int main() {
     for ( i = 0; i < N; ++i ) {
         if ( w[ i ][ N - 1 ] < solution ) {
             solution = w[ i ][ N - 1 ];
+            y = i;
         }
+    }
+
+    x = N - 1;
+    while ( x > 0 ) {
+        if ( y == 0 ) {
+            if ( w[ y + 1 ][ x ] < w[ y ][ x - 1 ] ) {
+                p.push( UP );
+                ++y;
+            }
+            else {
+                p.push( RIGHT );
+                --x;
+            }
+        }
+        else if ( y == N - 1 ) {
+            if ( w[ y - 1 ][ x ] < w[ y ][ x - 1 ] ) {
+                p.push( DOWN );
+                --y;
+            }
+            else {
+                p.push( RIGHT );
+                --x;
+            }
+        }
+        else {
+            minim = min( w[ y - 1 ][ x ], min( w[ y ][ x - 1 ], w[ y + 1 ][ x ] ) );
+            if ( minim == w[ y - 1 ][ x ] ) {
+                p.push( DOWN );
+                --y;
+            }
+            if ( minim == w[ y ][ x - 1 ] ) {
+                p.push( RIGHT );
+                --x;
+            }
+            if ( minim == w[ y + 1 ][ x ] ) {
+                p.push( UP );
+                ++y;
+            }
+        }
+    }
+    while ( !p.empty() ) {
+        switch ( p.top() ) {
+            case RIGHT:
+                printf( "Right\n" );
+                break;
+            case DOWN:
+                printf( "Down\n" );
+                break;
+            case UP:
+                printf( "UP\n" );
+                break;
+        }
+        p.pop();
     }
     fprintf( out, "%lli\n", solution );
 }
