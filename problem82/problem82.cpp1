@@ -1,0 +1,33 @@
+#include <cstdio>
+
+using namespace std;
+
+const int N = 5;
+
+void W( int *w,int i, int j ) {
+    int i, j, down;
+
+    down = matrix[ i + 1 ][ j ] + matrix[ i + 1 ][ j - 1 ];
+
+    w[ i ][ j ] = min( w[ i - 1 ][ j ], min( w[ i ][ j - 1 ], w[ i + 1 ][ j ] ) ) + matrix[ i ][ j ];
+}
+
+int i, j, matrix[ N ][ N ], w[ N ][ N ];
+FILE *in = fopen( "problem82.in", "r" ), *out = fopen( "problem82.out", "w" );
+
+int main() {
+    for ( i = 0; i < N; ++i ) {
+        for ( j = 0; j < 5; ++j ) {
+            fscanf( in, "%i,", &matrix[ i ][ j ] );
+            if ( j == 0 ) {
+                w[ i ][ j ] = matrix[ i ][ j ];
+            }
+        }
+    }
+    for ( i = 0; i < N; ++i ) {
+        for ( j = 0; j < 5; ++j ) {
+            printf( "%i ", w[ i ][ j ] );
+        }
+        printf( "\n" );
+    }
+}
