@@ -1,84 +1,54 @@
 #include <cstdio>
 #include <cstdlib>
-#include <utility>
 
 using namespace std;
 
-int path[ 120 ];
-int data[ 15 ][ 15 ];
-int i, o, max, sum, counter, key, value, head, elems, current, k;
-bool done;
+const int HEIGHT = 15;
+const int N = ( HEIGHT * ( HEIGHT + 1 ) )/2;
 
-int pos ( int y, int x ) {
-    int i, o, position = 0;
-    for ( i = 1; i <= y; ++i ) {
-        position += i;
+int max( int a, int b ) {
+    if ( a > b ) {
+        return a;
     }
-    position += x;
-
-    return position; 
+    return b;
 }
 
-void Path( int* array, int key ) {
-    int i;
-    if ( array[ key ] == 0 ) {
-        array[ key ] = 1;
-    }
-    else {
-        array[ key ] = 0;
-        Path( array, key - 1 );
-    }
-}
+FILE *in = fopen( "problem18.in", "r" ), *out = fopen( "problem18.out", "w" );
+int i, j, A[ N ][ N ], maxSum;
 
 int main() {
-    FILE *in = fopen( "in", "r" );
-    FILE *out = fopen( "out", "w" );
+    for ( i = 0; i < HEIGHT; ++i ) {
+        for ( j = 0; j < i + 1; ++j ) {
+            fscanf( in, "%d", &A[ i ][ j ] );
+        }
+    }
 
-    fscanf( in, "%i", &head );
-    sum = head;
-    data[ 0 ][ 0 ] = head;
-    for ( i = 1; i < 15; ++i ) {
-        for ( o = 0; o < i + 1; ++o ) {
-            fscanf( in, "%i", &data[ i ][ o ] );
-        }
-    }
-    
     i = 0;
-    o = 0;
-    while( !done ) {
-        printf( "\n" );
-        i = 0;
-        o = 0;
-        sum = head;
-        while ( i < 14 ) { 
-            if ( path[ pos( i, o ) ]  == 0 ) {
-                sum += data[ i + 1 ][ o ];
-            }
-            else {
-                sum += data[ i + 1 ][ o + 1 ];
-                ++o;
-            }
-            ++i;
-        }
-        if ( sum > max ) {
-            max = sum;
-        }
-        done = true;
-        for ( i = 0; i < 120; ++i ) {
-            if ( path[ i ] == 0 ) {
-                done = false;
-                break;
+    while ( i != HEIGHT ) {
+        for ( j = 0; j < i + 1; ++j ) {
+            if ( i != 0 ) {
+                if ( j != 0 && j != i ) {
+                    A[ i ][ j ] += max( A[ i - 1 ][ j ], A[ i - 1 ][ j - 1 ] );
+                }
+                else if ( j == i ) {
+                    A[ i ][ j ] += A[ i - 1 ][ j - 1 ];
+                }
+                else if ( j == 0 ) {
+                    A[ i ][ j ] += A[ i - 1 ][ j ];
+                }
             }
         }
-        Path( path, 14 );
+        ++i;
     }
-    for ( i = 0; i < 15; ++i ) {
-        for ( o = 0; o < i + 1; ++o ) {
-            printf( "%i ", data[ i ][ o ] );
+
+
+    for ( j = 0; j < HEIGHT; ++j ) {
+        if ( A[ HEIGHT - 1 ][ j ] > maxSum ) {
+            maxSum = A[ HEIGHT - 1 ][ j ];
         }
-        printf( "\n" );
     }
-    printf( "sum = %i\n", max );
+
+    printf( "Solution: %i\n", maxSum );
 
     return 0;
 }
