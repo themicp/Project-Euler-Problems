@@ -115,6 +115,34 @@ string multiply( string a, string b ) {
     return c;
 }
 
+string subtract( string a, string b ) {
+    int i, left = 0, j, k;
+    string c;
+    if ( a.size() < b.size() ) {
+        while ( a.size() < b.size() ) {
+            a.insert( 0, "0" );
+        }
+    }
+    else {
+        while ( b.size() < a.size() ) {
+            b.insert( 0, "0" );
+        }
+    }
+
+    for ( i = (int)a.size() - 1; i >= 0; --i ) {
+        j = b[ i ] - '0';
+        k = a[ i ] - '0';
+        j += left;
+        left = 0;
+        if ( j > k ) {
+            k += 10;
+            left = 1;
+        }
+        c.insert( 0, toString( k - j ) );
+    }
+    return c;
+}
+
 string str = toString( n );
 int i;
 long long int sum;
@@ -127,5 +155,6 @@ int main() {
         sum += str[ i ] - '0';
     }
     printf( "Solution: %lli\n", sum );
+    printf( "Subtract: %s\n", subtract( "199", "199" ).c_str() );
     return 0;
 }
