@@ -1,5 +1,4 @@
 #include <cstdio>
-#include <cmath>
 
 using namespace std;
 
@@ -30,13 +29,11 @@ bool odd( int n ) {
 int main() {
     for ( i = 1; i < N; ++i ) {
         reversed = reverse( i );
-        if ( floor( log10( i ) ) != floor( log10( reversed ) ) ) {
+        if ( i % 10 == 0 ) {
             continue;
         }
         sum = i + reversed;
-        if ( odd( sum ) ) {
-            ++S;
-        }
+        S += odd( sum );
     }
     printf( "%i\n", S );
     return 0;
