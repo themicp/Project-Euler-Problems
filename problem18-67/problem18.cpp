@@ -1,54 +1,62 @@
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
+
+#define H 15
+/* Problem 67
+#define H 100
+*/
 
 using namespace std;
 
-const int HEIGHT = 15;
-const int N = ( HEIGHT * ( HEIGHT + 1 ) )/2;
+int i, j;
+int** A;
+int** S;
+FILE* in = fopen( "problem18.in", "r" );
 
-int max( int a, int b ) {
-    if ( a > b ) {
-        return a;
+int MAXSUM( int x, int y ) {
+    if ( y == 0 ) {
+        S[ 0 ][ 0 ] = A[ 0 ][ 0 ];
+        return S[ 0 ][ 0 ];
     }
-    return b;
+    if ( S[ y - 1 ][ x ] == -1 ) {
+        S[ y - 1 ][ x ] = MAXSUM( x, y - 1 );
+    }
+    if ( x > 0 ) {
+        if ( S[ y - 1 ][ x - 1 ] == -1 ) {
+            S[ y - 1 ][ x - 1 ] = MAXSUM( x - 1, y - 1 );
+        }
+
+        return A[ y ][ x ] + max( S[ y - 1 ][ x - 1 ], S[ y - 1 ][ x ] );
+    }
+
+    return A[ y ][ x ] + S[ y - 1 ][ x ];
 }
 
-FILE *in = fopen( "problem18.in", "r" ), *out = fopen( "problem18.out", "w" );
-int i, j, A[ N ][ N ], maxSum;
-
 int main() {
-    for ( i = 0; i < HEIGHT; ++i ) {
-        for ( j = 0; j < i + 1; ++j ) {
+    A = ( int** )malloc( H * sizeof( int* ) );
+    S = ( int** )malloc( H * sizeof( int* ) );
+    for ( i = 0; i < H; ++i ) {
+        A[ i ] = ( int* )malloc( H * sizeof( int ) );
+        S[ i ] = ( int* )malloc( H * sizeof( int ) );
+
+        for ( j = 0; j < H; ++j ) {
+            A[ i ][ j ] = 0;
+            S[ i ][ j ] = -1;
+        }
+    }
+
+    for ( i = 0; i < H; ++i ) {
+        for ( j = 0; j <= i; ++j ) {
             fscanf( in, "%d", &A[ i ][ j ] );
         }
     }
 
-    i = 0;
-    while ( i != HEIGHT ) {
-        for ( j = 0; j < i + 1; ++j ) {
-            if ( i != 0 ) {
-                if ( j != 0 && j != i ) {
-                    A[ i ][ j ] += max( A[ i - 1 ][ j ], A[ i - 1 ][ j - 1 ] );
-                }
-                else if ( j == i ) {
-                    A[ i ][ j ] += A[ i - 1 ][ j - 1 ];
-                }
-                else if ( j == 0 ) {
-                    A[ i ][ j ] += A[ i - 1 ][ j ];
-                }
-            }
-        }
-        ++i;
+    int maxsum = 0;
+    for ( i = 0; i < H; ++i ) {
+        maxsum = max( maxsum, MAXSUM( i, H - 1 ) );
     }
-
-
-    for ( j = 0; j < HEIGHT; ++j ) {
-        if ( A[ HEIGHT - 1 ][ j ] > maxSum ) {
-            maxSum = A[ HEIGHT - 1 ][ j ];
-        }
-    }
-
-    printf( "Solution: %i\n", maxSum );
+    printf( "Max sum: %i\n", maxsum );
 
     return 0;
 }
