@@ -1,60 +1,54 @@
 #include <cstdio>
+#include <cstdlib>
+#include <algorithm>
 
 using namespace std;
 
-const int N = 80;
+int N;
+int **S, **A, i, j, maxsum = 0;
+FILE *in = fopen( "problem81.in", "r" );
 
-inline int min( int a, int b ) {
-    if ( a < b ) {
-        return a;
+int MinPath( int x, int y ) {
+    if ( x == 0 && y == 0 ) {
+        S[ 0 ][ 0 ] = A[ 0 ][ 0 ];
+        return S[ 0 ][ 0 ];
     }
-    return b;
+    int cost = 0;
+    int minSum = maxsum;
+    if ( y > 0 ) {
+        if ( S[ x ][ y - 1 ] == -1 ) {
+            S[ x ][ y - 1 ] = MinPath( x, y - 1 );
+        }
+
+        minSum = min( minSum, S[ x ][ y - 1 ] );
+    }
+    if ( x > 0 ) {
+        if ( S[ x - 1 ][ y ] == -1 ) {
+            S[ x - 1 ][ y ] = MinPath( x - 1, y );
+        }
+
+        minSum = min( minSum, S[ x - 1 ][ y ] );
+    }
+
+    return A[ x ][ y ] + minSum;
 }
-
-int w( int matrix[ N ][ N ], int i, int j, int W[ N ][ N ] ) {
-    if ( i != 0 && j != 0 ) {
-        if ( W[ i - 1 ][ j ] == 0 ) {
-            W[ i - 1 ][ j ] == w( matrix, i - 1, j, W );
-        }
-        if ( W[ i ][ j - 1 ] == 0 ) {
-            W[ i ][ j - 1 ] = w( matrix, i, j - 1, W );
-        }
-        W[ i ][ j ] = min( W[ i ][ j - 1 ], W[ i - 1 ][ j ] ) + matrix[ i ][ j ];
-        return W[ i ][ j ];
-    }
-
-    if ( i == 0 && j != 0 ) {
-        if ( W[ i ][ j - 1 ] == 0 ) {
-            W[ i ][ j - 1 ] = w( matrix, i, j - 1, W );
-        }
-        W[ i ][ j ] = W[ i ][ j - 1 ] + matrix[ i ][ j ];
-        return W[ i ][ j ];
-    }
-
-    if ( i != 0 && j == 0 ) {
-        if ( W[ i - 1 ][ j ] == 0 ) {
-            W[ i - 1 ][ j ] = w( matrix, i - 1, j, W );
-        }
-        W[ i ][ j ] = W[ i - 1 ][ j ] + matrix[ i ][ j ];
-        return W[ i ][ j ];
-    }
-
-    return matrix[ i ][ j ];
-}
-
-FILE *in = fopen( "problem81.in", "r" ), *out = fopen( "problem81.out", "w" );
-int matrix[ N ][ N ], i, o, W[ N ][ N ];
 
 int main() {
+    fscanf( in, "%i", &N );
+
+    S = ( int** )malloc( ( N + 1 ) * sizeof( int* ) );
+    A = ( int** )malloc( ( N + 1 ) * sizeof( int* ) );
     for ( i = 0; i < N; ++i ) {
-        for ( o = 0; o < N; ++o ) {
-            fscanf( in, "%i", &matrix[ i ][ o ] );
-            if ( o < N - 1 ) {
-                fscanf( in, "," );
-            }
+        S[ i ] = ( int* )malloc( ( N + 1 ) * sizeof( int ) );
+        A[ i ] = ( int* )malloc( ( N + 1 ) * sizeof( int ) );
+
+        for ( j = 0; j < N; ++j ) {
+            fscanf( in, "%i,", &A[ i ][ j ] );
+            maxsum += A[ i ][ j ];
+            S[ i ][ j ] = -1;
         }
     }
 
-    printf( "S = %i\n", w( matrix, N - 1, N - 1, W ) );
+    printf( "Min Path Sum: %i\n", MinPath( N - 1, N - 1 ) );
     return 0;
 }
